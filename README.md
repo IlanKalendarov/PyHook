@@ -16,5 +16,8 @@ PyHook Uses frida to inject it's dependencies into the target process
 | MobaXterm             | `CharUpperBuffA`                  | This will hook into MobaXterm and should give you credentials for SSH and RDP logins | DONE     |
 | explorer (UAC Prompt) | `CredUnPackAuthenticationBufferW` | This will hook into explorer and should give you Username, Password and the Domain name from the UAC Prompt | DONE     |
 
+# Demo
+
+![](https://github.com/IlanKalendarov/PyHook/blob/main/Demo/Demo.gif)
 
 Link my blog post covering this topic: https://ilankalendarov.github.io/posts/offensive-hooking
