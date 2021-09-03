@@ -4,10 +4,11 @@
 
 
 from __future__ import print_function
-import frida
+from threading import Lock
+from multiprocessing.pool import ThreadPool
 from time import sleep
+import frida
 import psutil
-from threading import Lock, Thread
 import sys
 
 from typing import List
@@ -426,17 +427,18 @@ def Cmd(Cmdpid):
         print(str(e))
 
 
+def run_thread_pool_for_functions(functions: list):
+    pool = ThreadPool(len(functions))
+    for function in functions:
+        pool.apply_async(function)
+    pool.close()
+    pool.join()
+
+
+def main():
+    functions = [WaitForRunAs, CredUI, WaitForPsExec, WaitForCmd, WaitForRDP, WaitForMobaXterm]
+    run_thread_pool_for_functions(functions)
+
+
 if __name__ == "__main__":
-    thread = Thread(target=WaitForRunAs)
-    thread2 = Thread(target=CredUI)
-    thread3 = Thread(target=WaitForPsExec)
-    thread4 = Thread(target=WaitForCmd)
-    thread5 = Thread(target=WaitForRDP)
-    thread6 = Thread(target=WaitForMobaXterm)
-    thread.start()
-    thread2.start()
-    thread3.start()
-    thread4.start()
-    thread5.start()
-    thread6.start()
-    thread.join()
+    main()
