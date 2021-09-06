@@ -8,9 +8,9 @@ def wait_for():
 
 def hook(pid):
     try:
-        print("[+] Trying To Attach To PsExec")
+        print("[ psexec-hook ] Trying To Attach To PsExec")
         session = frida.attach(pid)
-        print(f"[+] Attached PsExec with pid {pid}!")
+        print(f"[ psexec-hook ] Attached PsExec with pid {pid}!")
         script = session.create_script("""
 
 			var WNetAddConnection2W = Module.findExportByName("Mpr.dll", 'WNetAddConnection2W')
@@ -32,5 +32,5 @@ def hook(pid):
         script.load()
 
     except Exception as e:
-        print("[-] Unhandled exception: " + str(e))
-        print("[-] Continuing...")
+        print("[ psexec-hook ] Unhandled exception: " + str(e))
+        print("[ psexec-hook ] Continuing...")

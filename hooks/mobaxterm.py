@@ -8,9 +8,9 @@ def wait_for():
 
 def hook(pid):
     try:
-        print("[+] Trying To Attach To MobaXterm")
+        print("[ mobaxterm-hook ] Trying To Attach To MobaXterm")
         session = frida.attach(pid)
-        print(f"[+] Attached to MobaXterm pid {pid}!")
+        print(f"[ mobaxterm-hook ] Attached to MobaXterm pid {pid}!")
         script = session.create_script("""
 
 		var creds;
@@ -41,5 +41,5 @@ def hook(pid):
         script.load()
 
     except Exception as e:
-        print("[-] Unhandled exception: " + str(e))
-        print("[-] Continuing...")
+        print("[ mobaxterm-hook ] Unhandled exception: " + str(e))
+        print("[ mobaxterm-hook ] Continuing...")

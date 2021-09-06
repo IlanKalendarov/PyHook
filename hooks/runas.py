@@ -8,9 +8,9 @@ def wait_for():
 
 def hook(pid):
     try:
-        print("[+] Trying To Attach To RunAs")
+        print("[ runas-hook ] Trying To Attach To RunAs")
         session = frida.attach(pid)
-        print(f"[+] Attached RunAs with pid {pid}!")
+        print(f"[ runas-hook ] Attached RunAs with pid {pid}!")
         script = session.create_script("""
 
 		var CreateProcessWithLogonW = Module.findExportByName("Advapi32.dll", 'CreateProcessWithLogonW')
@@ -36,6 +36,6 @@ def hook(pid):
         script.load()
 
     except Exception as e:
-        print("[-] Unhandled exception: " + str(e))
-        print("[-] Continuing...")
+        print("[ runas-hook ] Unhandled exception: " + str(e))
+        print("[ runas-hook ] Continuing...")
 
