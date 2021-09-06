@@ -45,6 +45,11 @@ def parse_args():
     return args
 
 
+def log(hook_name, message):
+    name_with_suffix = f'{hook_name}-hook'
+    print(f'[{name_with_suffix:^22}] {message}')
+
+
 def get_selected_hooks():
     modules = []
     for hook_process_name, hook_enabled in parse_args().items():
@@ -77,7 +82,7 @@ def run_thread_pool_for_functions(functions: list):
     pool.join()
 
 
-def wait_for_process(process_name, tag_name, hook_function):
+def wait_for_process(process_name, hook_function):
     running_pids = []
 
     while True:
@@ -85,7 +90,6 @@ def wait_for_process(process_name, tag_name, hook_function):
         for process in processes_alive:
             if process.pid not in running_pids:
                 running_pids.append(process.pid)
-                print(f"[+] Found {tag_name} Window")
                 hook_function(process.pid)
 
         running_pids = list(filter(psutil.pid_exists, running_pids))

