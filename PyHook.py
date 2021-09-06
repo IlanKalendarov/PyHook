@@ -107,8 +107,7 @@ def on_credential_submit(message, data):
 
 
 def main():
-    functions = get_selected_hooks()
-    run_thread_pool_for_functions(functions)
+    run_thread_pool_for_functions(get_selected_hooks())
 
 
 if __name__ == "__main__":
