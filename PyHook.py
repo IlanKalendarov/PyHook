@@ -37,7 +37,9 @@ def parse_args():
     parser.add_argument('-e', '--explorer', action='store_true')
     parser.add_argument('-p', '--psexec', action='store_true')
     args = vars(parser.parse_args())
-    if not any(args.values()):
+
+    no_hooks_selected = not any(args.values())
+    if no_hooks_selected:
         for module in args.keys():
             args[module] = True
     return args
