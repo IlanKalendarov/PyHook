@@ -16,12 +16,12 @@ import re
 
 example_text = '''example:
 
-python PyHook.py [-cmxrep]
+python PyHook.py
 
 -c, --cmd          enable cmd hook.
 -r, --rdp          enable mstsc hook.
 -x, --xterm        enable mobaxterm hook.
--r, --runas        enable runas hook.
+-ru, --runas        enable runas hook.
 -e, --explorer     enable explorer hook.
 -p, --psexec       enable psexec hook.
 
