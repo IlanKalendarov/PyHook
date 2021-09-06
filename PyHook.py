@@ -19,7 +19,7 @@ example_text = '''example:
 python PyHook.py [-cmxrep]
 
 -c, --cmd          enable cmd hook.
--m, --mstsc        enable mstsc hook.
+-r, --rdp          enable mstsc hook.
 -x, --xterm        enable mobaxterm hook.
 -r, --runas        enable runas hook.
 -e, --explorer     enable explorer hook.
