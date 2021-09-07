@@ -10,11 +10,12 @@ PyHook Uses frida to inject it's dependencies into the target process
 
 | Process               | API Call                          | Description                                                  | Progress |
 | --------------------- | --------------------------------- | ------------------------------------------------------------ | -------- |
-| mstsc                 | `CredUnPackAuthenticationBufferW` | This will hook into mstsc and should give you Username and Password | DONE     |
-| runas                 | `CreateProcessWithLogonW`         | This will hook into runas and should give you Username, Password and the domain name | DONE     |
-| cmd                   | `RtlInitUnicodeStringEx`          | This should hook into cmd and then would be able to filter keywords like: PsExec,password etc.. | DONE     |
-| MobaXterm             | `CharUpperBuffA`                  | This will hook into MobaXterm and should give you credentials for SSH and RDP logins | DONE     |
-| explorer (UAC Prompt) | `CredUnPackAuthenticationBufferW` | This will hook into explorer and should give you Username, Password and the Domain name from the UAC Prompt | DONE     |
+| mstsc                 | `CredUnPackAuthenticationBufferW` | Hooks `CredUnPackAuthenticationBufferW` from mstsc and outputs username and password | DONE     |
+| runas                 | `CreateProcessWithLogonW`         | Hooks `CreateProcessWithLogonW` from runas and outputs username, password and a domain name. | DONE     |
+| PowerShell            | `CreateProcessWithLogonW`         | Hooks `CreateProcessWithLogonW` from PowerShell and outputs username, password and a domain name (e.g - `Start-Process cmd -Credential X`). | DONE     |
+| cmd                   | `RtlInitUnicodeStringEx`          | Hooks `RtlInitUnicodeStringEx` from cmd and outputs data from specific filters (e.g - "-p", "password" etc). | DONE     |
+| MobaXterm             | `CharUpperBuffA`                  | Hooks `CharUpperBuffA` from MobaXterm and outputs credentials for RDP and SSH logins. | DONE     |
+| explorer (UAC Prompt) | `CredUnPackAuthenticationBufferW` | Hooks `CredUnPackAuthenticationBufferW` from explorer and outputs username, password and a domain name. | DONE     |
 
 # Demo
 
