@@ -55,6 +55,7 @@ def get_selected_hooks():
     for hook_process_name, hook_enabled in parse_args().items():
         if hook_enabled:
             try:
+                print(f"[+] Waiting for {hook_process_name}")
                 hook_module = importlib.import_module(f"hooks.{hook_process_name}")
                 modules.append(hook_module.wait_for)
             except ModuleNotFoundError:
