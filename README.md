@@ -21,4 +21,4 @@ PyHook Uses frida to inject it's dependencies into the target process
 
 ![](https://github.com/IlanKalendarov/PyHook/blob/main/Demo/Demo.gif)
 
-Link my blog post covering this topic: https://ilankalendarov.github.io/posts/offensive-hooking
+Link to my blog post covering this topic: https://ilankalendarov.github.io/posts/offensive-hooking
