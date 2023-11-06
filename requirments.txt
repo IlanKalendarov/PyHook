@@ -1,2 +1,2 @@
-frida==15.1.1
+frida
 psutil==5.8.0
